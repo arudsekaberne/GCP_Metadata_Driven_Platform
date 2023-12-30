@@ -1,0 +1,8 @@
+# Info: https://www.w3schools.com/git/git_ignore.asp?remote=github
+
+# ignore files matching below pattern
+*.env
+
+# ignore ALL files in ANY directory named other
+other/
+__pycache__/
