@@ -1,22 +1,14 @@
 import logging
 
 
-
- 
-
-# logger.debug("Harmless debug Message")
-# logger.info("Just an information")
-# logger.warning("Its a Warning")
-# logger.error("Did you try to divide by zero")
-# logger.critical("Internet is down")
-
-
 class Logger():
 
-    def __init__(self, file_path: str):
+    """Class which helps in modularizing logging method"""
+
+    def __init__(self, file_path: str, filemode: str = "w"):
 
         # Create and configure logger
-        logging.basicConfig(filename=file_path, format="%(asctime)s %(message)s", filemode="w")
+        logging.basicConfig(filename=file_path, format="%(asctime)s :: %(levelname)-8s :: %(message)s", filemode=filemode)
 
         # Creating an object
         self.__log: Logger = logging.getLogger()
@@ -26,20 +18,21 @@ class Logger():
 
 
     def debug(self, value: str):
-        self.__log.debug(value); print(value)
+        self.__log.debug(value); print("DEBUG :: {}".format(value))
 
     def info(self, value: str):
-        self.__log.info(value); print(value)
+        self.__log.info(value); print("INFO :: {}".format(value))
 
     def warning(self, value: str):
-        self.__log.warning(value); print(value)
+        self.__log.warning(value); print("WARN :: {}".format(value))
 
     def error(self, value: str):
-        self.__log.error(value); print(value)
+        self.__log.error(value); print("ERROR :: {}".format(value))
 
     def critical(self, value: str):
-        self.__log.critical(value); print(value)
+        self.__log.critical(value); print("CRITICAL :: {}".format(value))
 
+    # Create a title card
     def title(self, value: str):
         title_len: int = 75
         title_dec: str = "*" * title_len

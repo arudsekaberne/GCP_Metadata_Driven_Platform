@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing_extensions import Literal
+from typing_extensions import Literal, Optional
 from pydantic import BaseModel, Field, constr, validator
 
 
@@ -9,8 +9,8 @@ class InputArguments(BaseModel):
 
     process_id      : int = Field(ge=1000)
     batch_date      : constr(regex=r"\d{4}-\d{2}-\d{2}", strip_whitespace=True)
-    from_checkpoint : int
-    to_checkpoint   : int
+    from_checkpoint : int = Field(ge=1)
+    to_checkpoint   : Optional[int] = Field(ge=1)
     environment     : Literal["Test", "Prod"]
 
     @validator("batch_date")

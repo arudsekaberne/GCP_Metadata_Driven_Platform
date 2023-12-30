@@ -2,7 +2,8 @@
 
 # ignore files matching below pattern
 *.env
+*.log
 
-# ignore ALL files in ANY directory named other
+# ignore all files from the below directory
 other/
 __pycache__/
