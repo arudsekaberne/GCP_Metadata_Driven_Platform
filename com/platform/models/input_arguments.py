@@ -7,7 +7,7 @@ class InputArguments(BaseModel):
 
     """Model which parse and validate user inputs and defines proper structure"""
 
-    process_id      : int = Field(ge=1000)
+    process_id      : int = Field(ge=100)
     batch_date      : constr(regex=r"\d{4}-\d{2}-\d{2}", strip_whitespace=True)
     from_checkpoint : int = Field(ge=1)
     to_checkpoint   : Optional[int] = Field(ge=1)
