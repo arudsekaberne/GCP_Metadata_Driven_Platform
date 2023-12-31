@@ -38,26 +38,24 @@ def main_execution():
     logger.info("Main execution started...")
 
     # Get, Parse, and Validate input arguments
-    parse_args: InputArguments = Inputs(logger).get()  
-
-    while True:
-        pass
+    parse_args: InputArguments = Inputs(logger).get()
 
 
 if __name__ == "__main__":
 
     # Pre-defined common static variables
-    static_variables: dict = StaticVariables.get_class_fields()
+    static_variables: StaticVariables = StaticVariables()
 
     # Fetch defined environmental variables
     env_variables: dict  = dotenv_values(".env")
 
     # Initialize logger
     input_id: int         = int(sys.argv[2].strip())
-    log_file_path: str    = env_variables.get("LOG_FILE_PATH")
-    log_file_name_ph: str = static_variables.get("LOG_FILE_NAME_PLACEHOLDER")
-    log_file: str         = os.path.join(log_file_path, log_file_name_ph.format(input_id, static_variables.get("RUNTIME")))
+    log_file_path: str    = static_variables.LOG_FILE_PATH
+    log_file_name_ph: str = static_variables.LOG_FILE_NAME_PLACEHOLDER
+    log_file: str         = os.path.join(log_file_path, log_file_name_ph.format(input_id, static_variables.RUNTIME))
     logger: Logger        = Logger(file_path=log_file)
+
 
     try:
 
@@ -72,9 +70,10 @@ if __name__ == "__main__":
         # Set service key to environment
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = env_variables.get("GCP_SERVICE_KEY_PATH")
         logger.info("GCP service key path set to environment")
-    
+
         # Main execution
         main_execution()
+
         
     except Exception as error:
         logger.error("Main execution failed...")

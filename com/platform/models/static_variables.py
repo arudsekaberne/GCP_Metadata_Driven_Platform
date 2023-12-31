@@ -1,18 +1,19 @@
 from datetime import datetime
+from pydantic import BaseModel
 
-class StaticVariables:
+
+class StaticVariables(BaseModel):
 
     """Module which holds common static variables (only getter enabled)"""
 
-    __RUNTIME: str = datetime.now().strftime("%Y%m%d_%H%M%S")
-    __LOG_FILE_NAME_PLACEHOLDER: str = r"{}_PLATFORM_{}.log"
+    # Execution variables
+    RUNTIME: str = datetime.now().strftime("%Y%m%d_%H%M%S")
 
+    # Execution file names
+    LOG_FILE_NAME_PLACEHOLDER: str = r"{}_PLATFORM_{}.log"
 
-    @staticmethod
-    def get_class_fields():
+    # Execution paths
+    LOG_FILE_PATH: str = r"C:\Users\USER\OneDrive\Career\Projects\GCP_Metadata_Driven_Pipeline\log"
 
-        return {
-            str(attr).replace("_StaticVariables__", ""): getattr(StaticVariables, attr)
-                for attr in dir(StaticVariables)
-                    if not callable(getattr(StaticVariables, attr)) and not attr.startswith("__")
-        }
+    class Config:
+        frozen = True

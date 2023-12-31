@@ -1,5 +1,6 @@
+from typing import Optional
 from datetime import datetime
-from typing_extensions import Literal, Optional
+from typing_extensions import Literal
 from pydantic import BaseModel, Field, constr, validator
 
 
