@@ -11,7 +11,7 @@ class ReferenceModel(BaseModel):
     
     id : constr(regex=r"^[1-9]\d*$", strip_whitespace=True)
     name : constr(strip_whitespace=True)
-    project_bucket : constr(strip_whitespace=True)
+    project_folder : constr(strip_whitespace=True)
     alert_mail_ids: List[str]
     sla_days: int = Field(gt=0)
     log_retention_count: int = Field(gt=0)
@@ -30,7 +30,7 @@ class ReferenceModel(BaseModel):
         formatted_emails = [email.strip() for email in value.split(",")]
         for email in formatted_emails:
             if not re.match(EMAIL_FORMAT, email):
-                raise ValueError(f"Invalid alert email address, please check alert_mail_ids in {CommonVariables.REF_TABLE_NAME} and mae sure you used ',' as delimiter.")
+                raise ValueError(f"Invalid alert email address, please check alert_mail_ids in {CommonVariables.REF_TABLE_NAME} and make sure you used ',' as delimiter.")
 
         return formatted_emails
     

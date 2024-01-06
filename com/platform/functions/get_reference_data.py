@@ -10,7 +10,7 @@ from com.platform.constants.common_variables import CommonVariables
 
 
 
-def reference_handler(process_id: int, bigquery: Bigquery, logger: Logger) -> ReferenceModel:
+def get_reference_data(process_id: int, bigquery: Bigquery, logger: Logger) -> ReferenceModel:
 
     """Function which handles the entire reference tabe data"""
 
