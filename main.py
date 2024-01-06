@@ -10,7 +10,7 @@ from com.platform.models.input_model import InputModel
 from com.platform.models.reference_model import ReferenceModel
 from com.platform.functions.inspect_bucket import inspect_bucket
 from com.platform.constants.common_variables import CommonVariables
-from com.platform.functions.reference_handler import reference_handler
+from com.platform.functions.get_reference_data import get_reference_data
 
 
 # Pre-defined Functions
@@ -53,13 +53,11 @@ def main_execution():
     storage: Storage = Storage(logger)
 
     # Fetch, Parse, and Validate reference data
-    parse_reference: ReferenceModel = reference_handler(parse_args.process_id, bigquery, logger)
+    parse_reference: ReferenceModel = get_reference_data(parse_args.process_id, bigquery, logger)
 
     # Check all mandatory dir exists in GCS
-    inspect_bucket(parse_reference.project_bucket, storage, logger)
+    inspect_bucket(parse_reference.project_folder, storage, logger)
      
-
-
 
 if __name__ == "__main__":
 
