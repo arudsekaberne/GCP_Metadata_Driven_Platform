@@ -4,8 +4,11 @@ from glob import glob
 from dotenv import dotenv_values
 from com.platform.utilities.logger import Logger
 from com.platform.utilities.inputs import Inputs
+from com.platform.utilities.bigquery import Bigquery
+from google.api_core.exceptions import GoogleAPIError
 from com.platform.models.input_arguments import InputArguments
 from com.platform.models.static_variables import StaticVariables
+from com.platform.functions.main_execution import main_execution
 
 
 # Pre-defined Functions
@@ -30,32 +33,20 @@ def interrupt_handler(signum, frame):
 
     # Ensure the exit functions are executed
     atexit._run_exitfuncs()
-    sys.exit(1)
-
-
-def main_execution():
-
-    logger.info("Main execution started...")
-
-    # Get, Parse, and Validate input arguments
-    parse_args: InputArguments = Inputs(logger).get()
-
+    sys.exit(2)
+    
 
 if __name__ == "__main__":
-
-    # Pre-defined common static variables
-    static_variables: StaticVariables = StaticVariables()
 
     # Fetch defined environmental variables
     env_variables: dict  = dotenv_values(".env")
 
     # Initialize logger
     input_id: int         = int(sys.argv[2].strip())
-    log_file_path: str    = static_variables.LOG_FILE_PATH
-    log_file_name_ph: str = static_variables.LOG_FILE_NAME_PLACEHOLDER
-    log_file: str         = os.path.join(log_file_path, log_file_name_ph.format(input_id, static_variables.RUNTIME))
+    log_file_path: str    = StaticVariables.LOG_FILE_PATH
+    log_file_name_ph: str = StaticVariables.LOG_FILE_NAME_PLACEHOLDER
+    log_file: str         = os.path.join(log_file_path, log_file_name_ph.format(input_id, StaticVariables.RUNTIME))
     logger: Logger        = Logger(file_path=log_file)
-
 
     try:
 
@@ -71,11 +62,17 @@ if __name__ == "__main__":
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = env_variables.get("GCP_SERVICE_KEY_PATH")
         logger.info("GCP service key path set to environment")
 
-        # Main execution
-        main_execution()
+        # Get, Parse, and Validate input arguments
+        parse_args: InputArguments = Inputs(logger).get()
 
+        # Create google cloud clients
+        bigquery: Bigquery = Bigquery(logger)
+
+        main_execution()
         
     except Exception as error:
-        logger.error("Main execution failed...")
+        
         logger.error(error)
+        logger.error("Main execution failed.")
+        sys.exit(1)
 

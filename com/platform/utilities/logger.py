@@ -14,7 +14,7 @@ class Logger():
         self.__log: Logger = logging.getLogger()
 
         # Setting the threshold of logger to DEBUG
-        self.__log.setLevel(logging.DEBUG)
+        self.__log.setLevel(logging.INFO)
 
 
     def debug(self, value: str):
