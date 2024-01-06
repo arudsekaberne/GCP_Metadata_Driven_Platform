@@ -1,9 +1,7 @@
-from typing import Union
-from google.cloud import bigquery
+from com.platform.utilities.helper import Helper
 from com.platform.utilities.logger import Logger
-from google.cloud.bigquery import Client, QueryJob
-from com.platform.models.static_variables import StaticVariables
-from google.cloud.bigquery.table import RowIterator, _EmptyRowIterator
+from google.cloud.bigquery.table import RowIterator
+from google.cloud.bigquery import Client, QueryJob, Row
 
 
 class Bigquery():
@@ -21,15 +19,18 @@ class Bigquery():
         """Function which takes select query as input and returns the result as output"""
 
         self.logger.info("SELECT QUERY function getting executed...")
-        self.logger.info("QUERY: {}".format(query))
+        self.logger.info(f"QUERY: {query}")
 
         # Makes an API request
         query_job: QueryJob = self.client.query(query)
         
         # Wait for query job to complete
-        query_result: RowIterator = query_job.result()
+        query_result: RowIterator    = query_job.result()
+        query_result_list: list[Row] = list(query_result)
+        
+        self.logger.info(f"QUERY: Returned {len(query_result_list)} record{Helper.singular_or_plural(len(query_result_list))}")
 
-        return list(query_result)
+        return query_result_list
     
 
     def execute_query(self, query: str) -> None:

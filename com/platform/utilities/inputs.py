@@ -1,6 +1,6 @@
 from argparse import ArgumentParser, Namespace
 from com.platform.utilities.logger import Logger
-from com.platform.models.input_arguments import InputArguments
+from com.platform.models.input_model import InputModel
 
 
 # Pass input arguments
@@ -23,11 +23,11 @@ class Inputs():
         parser.add_argument("-to",    "--to_checkpoint",   required=False, help="Executes the process until to checkpoint", default=None)
 
         input_args: Namespace             = parser.parse_args()
-        self.__parse_args: InputArguments = InputArguments(**vars(input_args))
+        self.__parse_args: InputModel = InputModel(**vars(input_args))
 
         logger.title("Input Arguments")
-        logger.info("Raw arguments: {}".format(input_args))
-        logger.info("Parsed arguments: {}".format(self.__parse_args))
+        logger.info(f"Raw arguments: {input_args}")
+        logger.info(f"Parsed arguments: {self.__parse_args}")
 
     def get(self):
 

@@ -4,11 +4,13 @@ from glob import glob
 from dotenv import dotenv_values
 from com.platform.utilities.logger import Logger
 from com.platform.utilities.inputs import Inputs
+from com.platform.utilities.storage import Storage
 from com.platform.utilities.bigquery import Bigquery
-from google.api_core.exceptions import GoogleAPIError
-from com.platform.models.input_arguments import InputArguments
-from com.platform.models.static_variables import StaticVariables
-from com.platform.functions.main_execution import main_execution
+from com.platform.models.input_model import InputModel
+from com.platform.models.reference_model import ReferenceModel
+from com.platform.functions.inspect_bucket import inspect_bucket
+from com.platform.constants.common_variables import CommonVariables
+from com.platform.functions.reference_handler import reference_handler
 
 
 # Pre-defined Functions
@@ -36,21 +38,44 @@ def interrupt_handler(signum, frame):
     sys.exit(2)
     
 
+def main_execution():
+    
+    """Function which provides all necessary inputs to the main platform execution functions"""
+
+    logger.title("Main Execution")
+
+    # Set service key to environment
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = env_variables.get("GCP_SERVICE_KEY_PATH")
+    logger.info("GCP service key path set to environment")
+    
+    # Create google cloud clients
+    bigquery: Bigquery = Bigquery(logger)
+    storage: Storage = Storage(logger)
+
+    # Fetch, Parse, and Validate reference data
+    parse_reference: ReferenceModel = reference_handler(parse_args.process_id, bigquery, logger)
+
+    # Check all mandatory dir exists in GCS
+    inspect_bucket(parse_reference.project_bucket, storage, logger)
+     
+
+
+
 if __name__ == "__main__":
 
     # Fetch defined environmental variables
     env_variables: dict  = dotenv_values(".env")
 
     # Initialize logger
-    input_id: int         = int(sys.argv[2].strip())
-    log_file_path: str    = StaticVariables.LOG_FILE_PATH
-    log_file_name_ph: str = StaticVariables.LOG_FILE_NAME_PLACEHOLDER
-    log_file: str         = os.path.join(log_file_path, log_file_name_ph.format(input_id, StaticVariables.RUNTIME))
+    input_id: int         = InputModel.validate_id(sys.argv[2])
+    log_file_path: str    = CommonVariables.LOG_FILE_PATH
+    log_file_name_ph: str = CommonVariables.LOG_FILE_NAME_PLACEHOLDER
+    log_file: str         = os.path.join(log_file_path, log_file_name_ph.format(input_id, CommonVariables.RUNTIME))
     logger: Logger        = Logger(file_path=log_file)
 
     try:
 
-        logger.title("Initial Setup")
+        logger.info("Plaform script started...")
 
         logger.info("Log file: {}".format(log_file))
 
@@ -58,16 +83,10 @@ if __name__ == "__main__":
         signal.signal(signal.SIGINT, interrupt_handler)
         logger.info("Interrupt handler got registered")
 
-        # Set service key to environment
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = env_variables.get("GCP_SERVICE_KEY_PATH")
-        logger.info("GCP service key path set to environment")
-
         # Get, Parse, and Validate input arguments
-        parse_args: InputArguments = Inputs(logger).get()
+        parse_args: InputModel = Inputs(logger).get()
 
-        # Create google cloud clients
-        bigquery: Bigquery = Bigquery(logger)
-
+        # Enterance for all platform execution
         main_execution()
         
     except Exception as error:

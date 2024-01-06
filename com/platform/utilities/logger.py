@@ -18,26 +18,35 @@ class Logger():
 
 
     def debug(self, value: str):
-        self.__log.debug(value); print("DEBUG :: {}".format(value))
+        self.__log.debug(value); print(f"DEBUG :: {value}")
 
     def info(self, value: str):
-        self.__log.info(value); print("INFO :: {}".format(value))
+        self.__log.info(value); print(f"INFO :: {value}")
 
     def warning(self, value: str):
-        self.__log.warning(value); print("WARN :: {}".format(value))
+        self.__log.warning(value); print(f"WARN :: {value}")
 
     def error(self, value: str):
-        self.__log.error(value); print("ERROR :: {}".format(value))
+        self.__log.error(value); print(f"ERROR :: {value}")
 
     def critical(self, value: str):
-        self.__log.critical(value); print("CRITICAL :: {}".format(value))
+        self.__log.critical(value); print(f"CRITICAL :: {value}")
+
 
     # Create a title card
     def title(self, value: str):
         title_len: int = 75
         title_dec: str = "*" * title_len
-        title_str: str = "\n{0}\n{1}\n{0}".format(title_dec, value.center(title_len, " "))
+        title_str: str = f"\n{title_dec}\n{value.strip().title().center(title_len, ' ')}\n{title_dec}"
         self.__log.info(title_str); print(title_str)
+
+
+    # Create a sub title card
+    def subtitle(self, value: str):
+        subtitle_len: int = 75
+        sub_title_str = f" {value.strip().title()} "
+        sub_title_str: str = f"\n{sub_title_str.center(subtitle_len, '-')}" 
+        self.__log.info(sub_title_str); print(sub_title_str)
 
     
  
