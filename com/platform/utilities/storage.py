@@ -18,8 +18,7 @@ class Storage():
 
     def list_blobs(self, folder=None) -> List[blob.Blob]:
         """Function return all blob name under given folder"""
-        self.logger.info(f"Storage.list_blobs() function getting executed...")
-        self.logger.info(f"Will return all blobs found under '{folder if folder else CommonVariables.BUCKET_NAME}'")
+        self.logger.info(f"Storage.list_blobs() function getting executed to list blobs under '{folder if folder else CommonVariables.BUCKET_NAME}'")
         return list(self.bucket.list_blobs(prefix=folder))
 
     def blob_exist(self, bucket_name: str, bucket_folder: str):

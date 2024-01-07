@@ -2,15 +2,16 @@ import os, sys
 import atexit, signal
 from glob import glob
 from dotenv import dotenv_values
-from com.platform.constants.placeholders import Placeholder
 from com.platform.functions import cleaner
 from com.platform.functions import collector
 from com.platform.functions import inspector
+from com.platform.utilities.helper import Helper
 from com.platform.utilities.logger import Logger
 from com.platform.utilities.inputs import Inputs
 from com.platform.utilities.storage import Storage
 from com.platform.utilities.bigquery import Bigquery
 from com.platform.models.input_model import InputModel
+from com.platform.constants.placeholders import Placeholder
 from com.platform.models.reference_model import ReferenceModel
 from com.platform.constants.common_variables import CommonVariables
 
@@ -106,4 +107,18 @@ if __name__ == "__main__":
             storage.upload_file(log_file, f"{parse_reference.project_folder}/log")
         
             # Clean log folder
-            cleaner.clean_log_folder(parse_reference.project_folder, parse_reference.log_retention_count, storage, logger)
+            cleaner.clean_log_folder(parse_reference.id, parse_reference.project_folder, parse_reference.log_retention_count, storage, logger)
+
+            # Only to run in local
+            log_file_path: str    = os.getcwd()
+            log_file_name: str    = Placeholder.LOG_FILE_NAME.value.replace(Placeholder.PROCESS_ID.value, "*")
+            log_file_name: str    = log_file_name.replace(Placeholder.RUNTIME.value, "*")
+            log_file_pattern: str = os.path.join(log_file_path, log_file_name)
+            log_files: list       = glob(log_file_pattern)
+
+            if len(log_files) > 1:
+                latest_log_file: str = sorted(log_files, key=os.path.getmtime, reverse=True)[0]
+
+                for log_file in log_files:
+                    if latest_log_file != log_file:
+                        os.remove(log_file)
