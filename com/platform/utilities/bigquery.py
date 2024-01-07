@@ -18,8 +18,8 @@ class Bigquery():
 
         """Function which takes select query as input and returns the result as output"""
 
-        self.logger.info("SELECT QUERY function getting executed...")
-        self.logger.info(f"QUERY: {query}")
+        self.logger.info("Bigquery.select_query() function getting executed...")
+        self.logger.info(f"Query: {query}")
 
         # Makes an API request
         query_job: QueryJob = self.client.query(query)
@@ -28,7 +28,7 @@ class Bigquery():
         query_result: RowIterator    = query_job.result()
         query_result_list: list[Row] = list(query_result)
         
-        self.logger.info(f"QUERY: Returned {len(query_result_list)} record{Helper.singular_or_plural(len(query_result_list))}")
+        self.logger.info(f"Query returned {len(query_result_list)} record{Helper.singular_or_plural(len(query_result_list))}")
 
         return query_result_list
     

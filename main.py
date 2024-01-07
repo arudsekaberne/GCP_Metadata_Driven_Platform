@@ -2,15 +2,16 @@ import os, sys
 import atexit, signal
 from glob import glob
 from dotenv import dotenv_values
+from com.platform.functions import cleaner
+from com.platform.functions import collector
+from com.platform.functions import inspector
 from com.platform.utilities.logger import Logger
 from com.platform.utilities.inputs import Inputs
 from com.platform.utilities.storage import Storage
 from com.platform.utilities.bigquery import Bigquery
 from com.platform.models.input_model import InputModel
 from com.platform.models.reference_model import ReferenceModel
-from com.platform.functions.inspect_bucket import inspect_bucket
 from com.platform.constants.common_variables import CommonVariables
-from com.platform.functions.get_reference_data import get_reference_data
 
 
 # Pre-defined Functions
@@ -19,6 +20,8 @@ def interrupt_handler(signum, frame):
 
     """Function which handles manual interruption, eg: Quit run"""
 
+    # TODO: Stop table log
+
     log_file_pattern: str = os.path.join(log_file_path, log_file_name_ph.format(input_id, "*"))
     log_files: list       = glob(log_file_pattern)
 
@@ -26,7 +29,7 @@ def interrupt_handler(signum, frame):
     if len(log_files) > 0:
         log_file: str = sorted(log_files, key=os.path.getmtime, reverse=True)[0]
 
-    logger: Logger = Logger(file_path=log_file, filemode="a")
+    logger: Logger = Logger(file_path=log_file)
 
     logger.title("Interrupt Handling")
     logger.info("Picked log file: {}".format(log_file))
@@ -37,27 +40,6 @@ def interrupt_handler(signum, frame):
     atexit._run_exitfuncs()
     sys.exit(2)
     
-
-def main_execution():
-    
-    """Function which provides all necessary inputs to the main platform execution functions"""
-
-    logger.title("Main Execution")
-
-    # Set service key to environment
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = env_variables.get("GCP_SERVICE_KEY_PATH")
-    logger.info("GCP service key path set to environment")
-    
-    # Create google cloud clients
-    bigquery: Bigquery = Bigquery(logger)
-    storage: Storage = Storage(logger)
-
-    # Fetch, Parse, and Validate reference data
-    parse_reference: ReferenceModel = get_reference_data(parse_args.process_id, bigquery, logger)
-
-    # Check all mandatory dir exists in GCS
-    inspect_bucket(parse_reference.project_folder, storage, logger)
-     
 
 if __name__ == "__main__":
 
@@ -70,6 +52,17 @@ if __name__ == "__main__":
     log_file_name_ph: str = CommonVariables.LOG_FILE_NAME_PLACEHOLDER
     log_file: str         = os.path.join(log_file_path, log_file_name_ph.format(input_id, CommonVariables.RUNTIME))
     logger: Logger        = Logger(file_path=log_file)
+
+    logger.title("Platform Execution")
+
+    # Set service key to environment
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = env_variables.get("GCP_SERVICE_KEY_PATH")
+    logger.info("GCP service key path set to environment")
+    
+    # Create google cloud clients
+    storage: Storage = Storage(logger)
+    bigquery: Bigquery = Bigquery(logger)
+    logger.info("GCP API clients got created")
 
     try:
 
@@ -84,12 +77,27 @@ if __name__ == "__main__":
         # Get, Parse, and Validate input arguments
         parse_args: InputModel = Inputs(logger).get()
 
-        # Enterance for all platform execution
-        main_execution()
+        # Fetch, Parse, and Validate reference data
+        parse_reference: ReferenceModel = collector.get_reference_data(parse_args.process_id, bigquery, logger)
+      
+        # Check all mandatory dir exists in GCS
+        mandatory_folder = inspector.check_process_mandatory_folders(parse_reference.project_folder, storage, logger)
+        
+        while True:
+            pass
         
     except Exception as error:
-        
-        logger.error(error)
+        logger.title("Error Block"); logger.error(error)
         logger.error("Main execution failed.")
         sys.exit(1)
 
+    finally:
+        logger.title("Final Block")
+        
+        if "mandatory_folder" in locals():
+
+            # Uploads current log file in user proejct log folder
+            storage.upload_file(log_file, f"{parse_reference.project_folder}/log")
+        
+            # Clean log folder
+            cleaner.clean_log_folder(parse_reference.project_folder, parse_reference.log_retention_count, storage, logger)

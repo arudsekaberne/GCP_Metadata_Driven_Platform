@@ -1,3 +1,4 @@
+import sys
 from typing import List
 from google.cloud.bigquery import Row
 from com.platform.utilities.logger import Logger
@@ -35,6 +36,7 @@ def get_reference_data(process_id: int, bigquery: Bigquery, logger: Logger) -> R
         logger.info(f"Raw reference: {reference_query_result_dict}")
         logger.info(f"Parsed reference: {parse_reference}")
 
+    logger.info(f"collector.get_reference_data() executed successfully, guarantee to get success and failure mail with log file as attachment")
+    
     return parse_reference
 
-    

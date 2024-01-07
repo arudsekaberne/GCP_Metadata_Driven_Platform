@@ -25,7 +25,7 @@ class Inputs():
         input_args: Namespace             = parser.parse_args()
         self.__parse_args: InputModel = InputModel(**vars(input_args))
 
-        logger.title("Input Arguments")
+        logger.subtitle("Input Arguments")
         logger.info(f"Raw arguments: {input_args}")
         logger.info(f"Parsed arguments: {self.__parse_args}")
 

@@ -1,6 +1,7 @@
-from google.cloud.storage import Bucket, Client
+from typing import List
 from com.platform.utilities.helper import Helper
 from com.platform.utilities.logger import Logger
+from google.cloud.storage import Bucket, Client, blob
 from com.platform.constants.common_variables import CommonVariables
 
 
@@ -11,29 +12,45 @@ class Storage():
     def __init__(self, logger: Logger):
         self.logger: Logger = logger
         self.client: Client = Client()
+        self.bucket: Bucket = self.client.get_bucket(CommonVariables.BUCKET_NAME)
         self.logger.info("Cloud storage client got created")
-
-    
-    def __create_bucket_obj(self, bucket_name: str) -> Bucket:
-
-        """Create and return bucket object"""
-
-        return self.client.get_bucket(bucket_name)
     
 
-    def blob_exists(self, bucket_name: str, blob_path: str):
+    def list_blobs(self, folder=None) -> List[blob.Blob]:
+        """Function return all blob name under given folder"""
+        self.logger.info(f"Storage.list_blobs() function getting executed...")
+        self.logger.info(f"Will return all blobs found under '{folder if folder else CommonVariables.BUCKET_NAME}'")
+        return list(self.bucket.list_blobs(prefix=folder))
 
-        """Function checks the given complete blob exists inside the given bucket"""
+    def blob_exist(self, bucket_name: str, bucket_folder: str):
 
-        self.logger.info(f"BLOB EXISTS function getting executed...")
-        blob_path: str = f"{blob_path.strip('/')}/"
-        self.logger.info(f"Find blob '{blob_path}' in '{bucket_name}'")
+        """Function checks the blob inside the bucket"""
 
-        # Create bucket object
-        bucket: Bucket = self.__create_bucket_obj(bucket_name)
+        self.logger.info(f"Storage.blob_exists() function getting executed...")
+        self.logger.info(f"Find blob '{bucket_folder}' in {bucket_name}")
 
         # Loop through all blob name
-        blob_exist: bool = any([blob.name.startswith(blob_path) for blob in bucket.list_blobs()])
-        self.logger.info(f"Blob exist: {blob_exist}")
+        for blob in self.list_blobs():
+            if blob.name.startswith(bucket_folder):
+                self.logger.info(f"Blob exist: {blob}")
+                return True
+            
+        self.logger.info(f"Blob not exist: {bucket_folder}")
+        return False
+    
 
-        return blob_exist
+    def upload_file(self, source_file_path: str, target_bucket_folder: str) -> None:
+
+        """Function which uploads any file into google cloud storage"""
+
+        self.logger.info(f"Storage.upload_file() function getting executed...")
+
+        target_file_name: str = Helper.extract_file_name(source_file_path)
+
+        # Create a blob with expiration period
+        blob = self.bucket.blob(f"{Helper.strip_path(target_bucket_folder)}/{target_file_name}")
+        
+        # Upload the file
+        blob.upload_from_filename(source_file_path)
+        self.logger.info(f"File '{target_file_name}' got uploaded into '{target_bucket_folder}'")
+

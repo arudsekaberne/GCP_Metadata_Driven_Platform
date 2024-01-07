@@ -20,17 +20,24 @@ class ReferenceModel(BaseModel):
     is_live: bool
 
 
+    @validator("project_folder", pre=True)
+    def format_project_folder(cls, value: str):
+
+        """This validate and format the project folder name"""
+        
+        return value.strip().strip("/")
+    
     @validator("alert_mail_ids", pre=True)
     def validate_emails(cls, value: str):
 
         """This validates the alert mail ids passed is in expected format"""
 
-        EMAIL_FORMAT: str = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+        EMAIL_FORMAT: str = r'\b[A-Za-z0-9._%+-]+@gmail\.com\b'
 
         formatted_emails = [email.strip() for email in value.split(",")]
         for email in formatted_emails:
             if not re.match(EMAIL_FORMAT, email):
-                raise ValueError(f"Invalid alert email address, please check alert_mail_ids in {CommonVariables.REF_TABLE_NAME} and make sure you used ',' as delimiter.")
+                raise ValueError(f"Invalid gmail address mentioned in alert_mail_ids, please check {CommonVariables.REF_TABLE_NAME} table. Also, make sure you used ',' as delimiter to mention multiple email ids.")
 
         return formatted_emails
     

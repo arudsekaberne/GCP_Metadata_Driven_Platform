@@ -5,7 +5,7 @@ class Logger():
 
     """Class which helps in modularizing logging method"""
 
-    def __init__(self, file_path: str, filemode: str = "w"):
+    def __init__(self, file_path: str, filemode: str = "a"):
 
         # Create and configure logger
         logging.basicConfig(filename=file_path, format="%(asctime)s :: %(levelname)-8s :: %(message)s", filemode=filemode)
