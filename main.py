@@ -83,9 +83,7 @@ if __name__ == "__main__":
         # Check all mandatory dir exists in GCS
         mandatory_folder = inspector.check_process_mandatory_folders(parse_reference.project_folder, storage, logger)
         
-        while True:
-            pass
-        
+
     except Exception as error:
         logger.title("Error Block"); logger.error(error)
         logger.error("Main execution failed.")
