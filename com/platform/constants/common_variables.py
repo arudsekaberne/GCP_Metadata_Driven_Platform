@@ -33,8 +33,5 @@ class CommonVariables(metaclass=ImmutableMetaModel):
     BUCKET_NAME: str = "platform_prod_bucket"
     MANDATORY_BLOBS: List[str] = ["log", "script", "inbound", "outbound"]
 
-    # Execution file names
-    LOG_FILE_NAME_PLACEHOLDER: str = r"{}_PLATFORM_{}.log"
 
-    # Execution paths
-    LOG_FILE_PATH: str = r"C:\Users\USER\OneDrive\Career\Projects\GCP_Metadata_Driven_Pipeline\log"
+

@@ -35,7 +35,7 @@ class Logger():
 
     # Create a title card
     def title(self, value: str):
-        title_len: int = 75
+        title_len: int = 125
         title_dec: str = "*" * title_len
         title_str: str = f"\n{title_dec}\n{value.strip().title().center(title_len, ' ')}\n{title_dec}"
         self.__log.info(title_str); print(title_str)
@@ -43,7 +43,7 @@ class Logger():
 
     # Create a sub title card
     def subtitle(self, value: str):
-        subtitle_len: int = 75
+        subtitle_len: int = 125
         sub_title_str = f" {value.strip().title()} "
         sub_title_str: str = f"\n{sub_title_str.center(subtitle_len, '-')}" 
         self.__log.info(sub_title_str); print(sub_title_str)

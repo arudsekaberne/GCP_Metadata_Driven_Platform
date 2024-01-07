@@ -2,6 +2,7 @@ import os, sys
 import atexit, signal
 from glob import glob
 from dotenv import dotenv_values
+from com.platform.constants.placeholders import Placeholder
 from com.platform.functions import cleaner
 from com.platform.functions import collector
 from com.platform.functions import inspector
@@ -17,12 +18,13 @@ from com.platform.constants.common_variables import CommonVariables
 # Pre-defined Functions
 
 def interrupt_handler(signum, frame):
-
+    
     """Function which handles manual interruption, eg: Quit run"""
 
-    # TODO: Stop table log
-
-    log_file_pattern: str = os.path.join(log_file_path, log_file_name_ph.format(input_id, "*"))
+    log_file_path: str    = os.getcwd()
+    log_file_name: str    = Placeholder.LOG_FILE_NAME.value.replace(Placeholder.PROCESS_ID.value, str(input_id))
+    log_file_name: str    = log_file_name.replace(Placeholder.RUNTIME.value, "*")
+    log_file_pattern: str = os.path.join(log_file_path, log_file_name)
     log_files: list       = glob(log_file_pattern)
 
     # Get last modified log file
@@ -34,7 +36,9 @@ def interrupt_handler(signum, frame):
     logger.title("Interrupt Handling")
     logger.info("Picked log file: {}".format(log_file))
     logger.warning("Execution got manually interrupted.")
-    logger.warning("Therefore, the main and checkpoint log table value will gets updated with status 'STOPPED'.")
+    logger.warning("Therefore, the main and checkpoint log table 'INPROGRESS' value will gets updated with status 'STOPPED'.")
+
+    # TODO: Stop table log
 
     # Ensure the exit functions are executed
     atexit._run_exitfuncs()
@@ -47,11 +51,12 @@ if __name__ == "__main__":
     env_variables: dict  = dotenv_values(".env")
 
     # Initialize logger
-    input_id: int         = InputModel.validate_id(sys.argv[2])
-    log_file_path: str    = CommonVariables.LOG_FILE_PATH
-    log_file_name_ph: str = CommonVariables.LOG_FILE_NAME_PLACEHOLDER
-    log_file: str         = os.path.join(log_file_path, log_file_name_ph.format(input_id, CommonVariables.RUNTIME))
-    logger: Logger        = Logger(file_path=log_file)
+    input_id: int      = InputModel.validate_id(sys.argv[2])
+    log_file_path: str = os.getcwd()
+    log_file_name: str = Placeholder.LOG_FILE_NAME.value.replace(Placeholder.PROCESS_ID.value, str(input_id))
+    log_file_name: str = log_file_name.replace(Placeholder.RUNTIME.value, CommonVariables.RUNTIME)
+    log_file: str      = os.path.join(log_file_path, log_file_name)
+    logger: Logger     = Logger(file_path=log_file)
 
     logger.title("Platform Execution")
 
@@ -79,9 +84,12 @@ if __name__ == "__main__":
 
         # Fetch, Parse, and Validate reference data
         parse_reference: ReferenceModel = collector.get_reference_data(parse_args.process_id, bigquery, logger)
-      
+
         # Check all mandatory dir exists in GCS
         mandatory_folder = inspector.check_process_mandatory_folders(parse_reference.project_folder, storage, logger)
+
+        # Check the current process is active
+        inspector.is_process_active(parse_reference.is_active, parse_reference.name, logger)
         
 
     except Exception as error:
