@@ -22,10 +22,7 @@ def interrupt_handler(signum, frame):
     
     """Function which handles manual interruption, eg: Quit run"""
 
-    log_file_path: str    = os.getcwd()
-    log_file_name: str    = Placeholder.LOG_FILE_NAME.value.replace(Placeholder.PROCESS_ID.value, str(input_id))
-    log_file_name: str    = log_file_name.replace(Placeholder.RUNTIME.value, "*")
-    log_file_pattern: str = os.path.join(log_file_path, log_file_name)
+    log_file_pattern: str = os.path.join(os.getcwd(), Helper.format_log_name(input_id, "*"))
     log_files: list       = glob(log_file_pattern)
 
     # Get last modified log file
@@ -52,12 +49,9 @@ if __name__ == "__main__":
     env_variables: dict  = dotenv_values(".env")
 
     # Initialize logger
-    input_id: int      = InputModel.validate_id(sys.argv[2])
-    log_file_path: str = os.getcwd()
-    log_file_name: str = Placeholder.LOG_FILE_NAME.value.replace(Placeholder.PROCESS_ID.value, str(input_id))
-    log_file_name: str = log_file_name.replace(Placeholder.RUNTIME.value, CommonVariables.RUNTIME)
-    log_file: str      = os.path.join(log_file_path, log_file_name)
-    logger: Logger     = Logger(file_path=log_file)
+    input_id: int  = InputModel.validate_id(sys.argv[2])
+    log_file: str  = os.path.join(os.getcwd(), Helper.format_log_name(input_id, CommonVariables.RUNTIME))
+    logger: Logger = Logger(file_path=log_file)
 
     logger.title("Platform Execution")
 
@@ -94,7 +88,8 @@ if __name__ == "__main__":
         
 
     except Exception as error:
-        logger.title("Error Block"); logger.error(error)
+        logger.title("Exception Block")
+        logger.error(error)
         logger.error("Main execution failed.")
         sys.exit(1)
 
@@ -103,13 +98,13 @@ if __name__ == "__main__":
         
         if "mandatory_folder" in locals():
 
-            # Uploads current log file in user proejct log folder
-            storage.upload_file(log_file, f"{parse_reference.project_folder}/log")
+            # Uploads current log file in user project log folder
+            storage.upload_file(log_file, f"{parse_reference.project_folder}/{CommonVariables.GCP_LOG_DIR_NAME}")
         
             # Clean log folder
             cleaner.clean_log_folder(parse_reference.id, parse_reference.project_folder, parse_reference.log_retention_count, storage, logger)
 
-            # Only to run in local
+            # Removes existing log and maintain one
             log_file_path: str    = os.getcwd()
             log_file_name: str    = Placeholder.LOG_FILE_NAME.value.replace(Placeholder.PROCESS_ID.value, "*")
             log_file_name: str    = log_file_name.replace(Placeholder.RUNTIME.value, "*")

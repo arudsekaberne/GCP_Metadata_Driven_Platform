@@ -14,14 +14,14 @@ def check_process_mandatory_folders(project_folder: str, storage: Storage, logge
     logger.subtitle("Inspect Bucket")
 
     # Check mandatry blob exists
-    for mandatory_blob in CommonVariables.MANDATORY_BLOBS:
+    for mandatory_blob in CommonVariables.GCP_MANDATORY_BLOBS:
 
         mandatory_blob_path = f"{project_folder}/{mandatory_blob}/"
 
-        if not storage.blob_exist(CommonVariables.BUCKET_NAME, mandatory_blob_path):
-            raise GoogleAPIError(f"The mandatory folder '{mandatory_blob_path}' not exists in {CommonVariables.BUCKET_NAME}.")
+        if not storage.blob_exist(CommonVariables.GCP_BUCKET_NAME, mandatory_blob_path):
+            raise GoogleAPIError(f"The mandatory folder '{mandatory_blob_path}' not exists in {CommonVariables.GCP_BUCKET_NAME}.")
         
-    logger.info(f"inspector.check_process_mandatory_folders() executed successfully, guaranteed to store log file under user project log folder")
+    logger.info(f"inspector.check_process_mandatory_folders() executed successfully, which guarantees to store log file under user project log folder")
     
     
 def is_process_active(is_active: bool, process_name: str, logger: Logger) -> None:

@@ -29,9 +29,14 @@ class CommonVariables(metaclass=ImmutableMetaModel):
     CHK_TABLE_IDN: str   = __table_identifier(PROJECT_ID, PROJECT_DATASET, CHK_TABLE_NAME)
 
     # Colud Storage Information
-    BUCKET_URL: str = ""
-    BUCKET_NAME: str = "platform_prod_bucket"
-    MANDATORY_BLOBS: List[str] = ["log", "script", "inbound", "outbound"]
+    GCP_BUCKET_URL: str  = ""
+    GCP_BUCKET_NAME: str = "platform_prod_bucket"
+
+    GCP_LOG_DIR_NAME: str      = "log"
+    GCP_SCRIPT_DIR_NAME: str   = "script"
+    GCP_INBOUND_DIR_NAME: str  = "inbound"
+    GCP_OUTBOUND_DIR_NAME: str = "outbound"
+    GCP_MANDATORY_BLOBS: List[str] = [GCP_LOG_DIR_NAME, GCP_SCRIPT_DIR_NAME, GCP_INBOUND_DIR_NAME, GCP_OUTBOUND_DIR_NAME]
 
 
 

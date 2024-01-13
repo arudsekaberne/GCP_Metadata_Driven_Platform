@@ -12,13 +12,13 @@ class Storage():
     def __init__(self, logger: Logger):
         self.logger: Logger = logger
         self.client: Client = Client()
-        self.bucket: Bucket = self.client.get_bucket(CommonVariables.BUCKET_NAME)
+        self.bucket: Bucket = self.client.get_bucket(CommonVariables.GCP_BUCKET_NAME)
         self.logger.info("Cloud storage client got created")
     
 
     def list_blobs(self, folder=None) -> List[blob.Blob]:
         """Function return all blob name under given folder"""
-        self.logger.info(f"Storage.list_blobs() function getting executed to list blobs under '{folder if folder else CommonVariables.BUCKET_NAME}'")
+        self.logger.info(f"Storage.list_blobs() function getting executed to list blobs under '{folder if folder else CommonVariables.GCP_BUCKET_NAME}'")
         return list(self.bucket.list_blobs(prefix=folder))
 
     def blob_exist(self, bucket_name: str, bucket_folder: str):
@@ -46,7 +46,7 @@ class Storage():
 
         target_file_name: str = Helper.extract_file_name(source_file_path)
 
-        # Create a blob with expiration period
+        # Creates blob file from source file
         blob = self.bucket.blob(f"{Helper.strip_path(target_bucket_folder)}/{target_file_name}")
         
         # Upload the file
