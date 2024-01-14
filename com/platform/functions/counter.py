@@ -9,6 +9,7 @@ def main_log_insert(process_id: int, bigquery: Bigquery, logger: Logger) -> None
 
     """Function which inserts an entry in the Reference log table"""
 
+    logger.subtitle("Main Log Insert")
     logger.info("counter.main_log_insert() function getting executed...")
 
     # Preparing reference sql select statement
@@ -24,6 +25,7 @@ def main_log_update(process_id: int, status: str, error_message: str, bigquery: 
 
     """Function which updates last entry in the Reference log table"""
 
+    logger.subtitle("Main Log Update")
     logger.info("counter.main_log_update() function getting executed...")
 
     # Preparing reference sql select statement

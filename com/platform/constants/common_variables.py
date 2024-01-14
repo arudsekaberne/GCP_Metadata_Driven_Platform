@@ -25,9 +25,9 @@ class CommonVariables(metaclass=ImmutableMetaModel):
 
     # Bigquery Table Information
     REF_TABLE_NAME: str  = "reference"
+    CHK_TABLE_NAME: str  = "checkpoint"
     REF_LOG_TABLE_NAME: str  = "reference_log"
-    CHK_TABLE_NAME: str  = "reference_checkpoint"
-    CHK_LOG_TABLE_NAME: str  = "reference_checkpoint_log"
+    CHK_LOG_TABLE_NAME: str  = "checkpoint_log"
 
     REF_TABLE_IDN: str   = __table_identifier(PROJECT_ID, PROJECT_DATASET, REF_TABLE_NAME)
     CHK_TABLE_IDN: str   = __table_identifier(PROJECT_ID, PROJECT_DATASET, CHK_TABLE_NAME)

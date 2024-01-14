@@ -18,6 +18,12 @@ class SqlStatements:
         ORDER BY last_modified_utc DESC LIMIT 1;        
     """
 
+    CHK_SELECT_STATEMENT = f"""
+        SELECT * FROM {CommonVariables.CHK_TABLE_IDN}
+        WHERE process_id = {Placeholder.PROCESS_ID.value} AND is_active
+        ORDER BY checkpoint_sequence ASC;        
+    """
+
     REF_LOG_INSERT_STATEMENT = f"""
         INSERT INTO {CommonVariables.REF_LOG_TABLE_IDN} (batch_id, batch_code, process_id, batch_date, batch_sequence, status, start_timestamp)
         VALUES (
