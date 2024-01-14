@@ -1,8 +1,10 @@
 import os, sys
+import traceback
 import atexit, signal
 from glob import glob
 from dotenv import dotenv_values
 from com.platform.functions import cleaner
+from com.platform.functions import counter
 from com.platform.functions import collector
 from com.platform.functions import inspector
 from com.platform.utilities.helper import Helper
@@ -11,6 +13,7 @@ from com.platform.utilities.inputs import Inputs
 from com.platform.utilities.storage import Storage
 from com.platform.utilities.bigquery import Bigquery
 from com.platform.models.input_model import InputModel
+from com.platform.constants.log_status import LogStatus
 from com.platform.constants.placeholders import Placeholder
 from com.platform.models.reference_model import ReferenceModel
 from com.platform.constants.common_variables import CommonVariables
@@ -36,7 +39,13 @@ def interrupt_handler(signum, frame):
     logger.warning("Execution got manually interrupted.")
     logger.warning("Therefore, the main and checkpoint log table 'INPROGRESS' value will gets updated with status 'STOPPED'.")
 
-    # TODO: Stop table log
+    # Update reference log table
+    if "main_log_insert" in globals():
+
+        logger.info(f"Updating {CommonVariables.REF_LOG_TABLE_NAME} with status '{LogStatus.STOPPED.value}'")
+
+        counter.main_log_update(parse_reference.process_id, LogStatus.STOPPED.value, "Exection stopped manualy", bigquery, logger)
+
 
     # Ensure the exit functions are executed
     atexit._run_exitfuncs()
@@ -84,11 +93,24 @@ if __name__ == "__main__":
         mandatory_folder = inspector.check_process_mandatory_folders(parse_reference.project_folder, storage, logger)
 
         # Check the current process is active
-        inspector.is_process_active(parse_reference.is_active, parse_reference.name, logger)
+        inspector.is_process_active(parse_reference.is_active, parse_reference.process_name, logger)
         
+        # Insert an entry in the main log
+        main_log_insert = counter.main_log_insert(parse_reference.process_id, bigquery, logger)
+
+        # Update main log with 'COMPLETED' status
+        counter.main_log_update(parse_reference.process_id, LogStatus.COMPLETED.value, "NULL", bigquery, logger)
 
     except Exception as error:
         logger.title("Exception Block")
+
+        # Update reference log table
+        if "main_log_insert" in locals():
+
+            logger.info(f"Updating {CommonVariables.REF_LOG_TABLE_NAME} with status '{LogStatus.FAILED.value}'")
+            error_message: str = traceback.format_exc().splitlines()[-1]
+            counter.main_log_update(parse_reference.process_id, LogStatus.STOPPED.value, error_message, bigquery, logger)
+
         logger.error(error)
         logger.error("Main execution failed.")
         sys.exit(1)
@@ -102,7 +124,7 @@ if __name__ == "__main__":
             storage.upload_file(log_file, f"{parse_reference.project_folder}/{CommonVariables.GCP_LOG_DIR_NAME}")
         
             # Clean log folder
-            cleaner.clean_log_folder(parse_reference.id, parse_reference.project_folder, parse_reference.log_retention_count, storage, logger)
+            cleaner.clean_log_folder(parse_reference.process_id, parse_reference.project_folder, parse_reference.log_retention_count, storage, logger)
 
             # Removes existing log and maintain one
             log_file_path: str    = os.getcwd()

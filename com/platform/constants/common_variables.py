@@ -16,6 +16,7 @@ class CommonVariables(metaclass=ImmutableMetaModel):
     __table_identifier     = lambda id, dataset, table: f"`{id}.{dataset}.{table}`"
 
     # Execution variables
+    DATE: str = datetime.now().strftime("%Y-%m-%d")
     RUNTIME: str = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # GCP Project details
@@ -23,10 +24,15 @@ class CommonVariables(metaclass=ImmutableMetaModel):
     PROJECT_DATASET: str = "pp_compliance_ods"
 
     # Bigquery Table Information
-    REF_TABLE_NAME: str  = "platform_reference"
-    CHK_TABLE_NAME: str  = "platform_checkpoint"
+    REF_TABLE_NAME: str  = "reference"
+    REF_LOG_TABLE_NAME: str  = "reference_log"
+    CHK_TABLE_NAME: str  = "reference_checkpoint"
+    CHK_LOG_TABLE_NAME: str  = "reference_checkpoint_log"
+
     REF_TABLE_IDN: str   = __table_identifier(PROJECT_ID, PROJECT_DATASET, REF_TABLE_NAME)
     CHK_TABLE_IDN: str   = __table_identifier(PROJECT_ID, PROJECT_DATASET, CHK_TABLE_NAME)
+    REF_LOG_TABLE_IDN: str = __table_identifier(PROJECT_ID, PROJECT_DATASET, REF_LOG_TABLE_NAME)
+    CHK_LOG_TABLE_IDN: str = __table_identifier(PROJECT_ID, PROJECT_DATASET, CHK_LOG_TABLE_NAME)
 
     # Colud Storage Information
     GCP_BUCKET_URL: str  = ""

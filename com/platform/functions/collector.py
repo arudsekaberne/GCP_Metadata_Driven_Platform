@@ -1,4 +1,3 @@
-import sys
 from typing import List
 from google.cloud.bigquery import Row
 from com.platform.utilities.logger import Logger

@@ -37,6 +37,9 @@ class Bigquery():
 
         """Function which takes any biqguery statement as input and executes them"""
 
+        self.logger.info("Bigquery.execute_query() function getting executed...")
+        self.logger.info(f"Query: {query}")
+
         # Makes an API request
         query_job: QueryJob = self.client.query(query)
         

@@ -9,8 +9,9 @@ class ReferenceModel(BaseModel):
 
     """Model which parse and validate user reference table value and defines proper structure"""
     
-    id : constr(regex=r"^[1-9]\d*$", strip_whitespace=True)
-    name : constr(strip_whitespace=True)
+    process_id : constr(regex=r"^[1-9]\d*$", strip_whitespace=True)
+    process_name : constr(strip_whitespace=True)
+    module_name : constr(strip_whitespace=True)
     project_folder : constr(strip_whitespace=True)
     alert_mail_ids: List[str]
     sla_days: int = Field(gt=0)
