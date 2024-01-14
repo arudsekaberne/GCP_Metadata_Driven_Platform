@@ -1,24 +1,22 @@
+# Module imports
+
 import os, sys
-import traceback
 import atexit, signal
 from glob import glob
 from typing import List
 from dotenv import dotenv_values
-from com.platform.functions import cleaner
-from com.platform.functions import counter
-from com.platform.functions import collector
-from com.platform.functions import inspector
-from com.platform.models.checkpoint_model import CheckpointModel
 from com.platform.utilities.helper import Helper
 from com.platform.utilities.logger import Logger
 from com.platform.utilities.inputs import Inputs
 from com.platform.utilities.storage import Storage
 from com.platform.utilities.bigquery import Bigquery
 from com.platform.models.input_model import InputModel
-from com.platform.models.log_status import LogStatus
+from com.platform.constants.table_schema import LogStatus
 from com.platform.constants.placeholders import Placeholder
 from com.platform.models.reference_model import ReferenceModel
+from com.platform.models.checkpoint_model import CheckpointModel
 from com.platform.constants.common_variables import CommonVariables
+from com.platform.functions import cleaner, counter, runner, inspector, collector
 
 
 # Pre-defined Functions
@@ -38,7 +36,7 @@ def interrupt_handler(signum, frame):
 
     logger.title("Interrupt Handling")
     logger.info("Picked log file: {}".format(log_file))
-    logger.warning("Execution got manually interrupted.")
+    logger.warning("Execution got interrupted.")
     logger.warning("Therefore, the main and checkpoint log table 'INPROGRESS' value will gets updated with status 'STOPPED'.")
 
     # Update reference log with 'STOPPED' status
@@ -46,7 +44,7 @@ def interrupt_handler(signum, frame):
 
         logger.info(f"Updating {CommonVariables.REF_LOG_TABLE_NAME} with status '{LogStatus.STOPPED.value}'")
 
-        counter.main_log_update(parse_reference.process_id, LogStatus.STOPPED.value, "Exection stopped manualy", bigquery, logger)
+        counter.main_log_update(parse_reference.process_id, LogStatus.STOPPED.value, "Execution got interrupted", bigquery, logger)
 
 
     # Ensure the exit functions are executed
@@ -103,11 +101,12 @@ if __name__ == "__main__":
         # Fetch, Parse, and Validate checkpoint data
         checkpoints: List[CheckpointModel] = collector.get_checkpoint_data(parse_reference.process_id, bigquery, logger)
 
+        # Execute each checkpoint
         for checkpoint in checkpoints:
-            logger.title(f"{checkpoint.checkpoint_sequence}. {checkpoint.checkpoint_type} Execution")
+            runner.execute_checkpoint(parse_reference, checkpoint, bigquery, storage, logger)
 
         # Update reference log with 'COMPLETED' status
-        counter.main_log_update(parse_reference.process_id, LogStatus.COMPLETED.value, "NULL", bigquery, logger)
+        counter.main_log_update(parse_reference.process_id, LogStatus.COMPLETED.value, None, bigquery, logger)
 
     except Exception as error:
         logger.title("Exception Block")
@@ -116,8 +115,8 @@ if __name__ == "__main__":
         if "main_log_insert" in locals():
 
             logger.info(f"Updating {CommonVariables.REF_LOG_TABLE_NAME} with status '{LogStatus.FAILED.value}'")
-            error_message: str = traceback.format_exc().splitlines()[-1]
-            counter.main_log_update(parse_reference.process_id, LogStatus.STOPPED.value, error_message, bigquery, logger)
+
+            counter.main_log_update(parse_reference.process_id, LogStatus.FAILED.value, error.message.split("\n")[0].strip(), bigquery, logger)
 
         logger.error(error)
         logger.error("Main execution failed.")

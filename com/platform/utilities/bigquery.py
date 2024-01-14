@@ -1,7 +1,9 @@
 from com.platform.utilities.helper import Helper
 from com.platform.utilities.logger import Logger
+from com.platform.utilities.storage import Storage
 from google.cloud.bigquery.table import RowIterator
 from google.cloud.bigquery import Client, QueryJob, Row
+from com.platform.constants.common_variables import CommonVariables
 
 
 class Bigquery():
@@ -30,6 +32,8 @@ class Bigquery():
         
         self.logger.info(f"Query returned {len(query_result_list)} record{Helper.singular_or_plural(len(query_result_list))}")
 
+        self.logger.info("Bigquery.select_query() executed successfully")
+
         return query_result_list
     
 
@@ -46,9 +50,18 @@ class Bigquery():
         # Wait for query job to complete
         query_job.result()
 
+        self.logger.info("Bigquery.execute_query() function executed successfully")
 
-    def execute_file(self, sql_file: str) -> None:
+
+    def execute_file(self, project_folder: str, sql_file: str, storage: Storage) -> None:
 
         """Function which takes a sql file as input and executes them"""
 
-        pass
+        self.logger.info("Bigquery.execute_file() function getting executed...")
+
+        file_query: str = storage.bucket.blob(f"{project_folder}/{CommonVariables.GCP_SCRIPT_DIR_NAME}/{sql_file}").download_as_text()
+
+        self.execute_query(file_query)
+
+        self.logger.info("Bigquery.execute_file() function executed successfully")
+

@@ -11,6 +11,4 @@ class Placeholder(Enum):
     CURRENT_DATE: str      = r"${CURRENT_DATE}"
     LOG_ERROR_MSG: str     = r"${LOG_ERROR_MSG}"
     CURRENT_TIMESTAMP: str = r"${CURRENT_TIMESTAMP}"
-    
-
-    LOG_FILE_NAME: str = fr"{PROCESS_ID}_PLATFORM_{RUNTIME}.log"
+    LOG_FILE_NAME: str     = fr"{PROCESS_ID}_PLATFORM_{RUNTIME}.log"

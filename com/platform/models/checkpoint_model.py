@@ -1,8 +1,8 @@
 import json
-from typing_extensions import Literal
+from datetime import datetime
 from typing import Dict, Optional
-from pydantic import BaseModel, constr, validator, ConstrainedStr
-from com.platform.models.checkpoint_type_model import CheckpointType
+from pydantic import BaseModel, constr, validator
+from com.platform.constants.table_schema import CheckpointType, CheckpointScriptType
 
 
 class CheckpointModel(BaseModel):
@@ -13,12 +13,13 @@ class CheckpointModel(BaseModel):
     checkpoint_sequence : constr(regex=r"^[1-9]\d*$", strip_whitespace=True)
     process_name : constr(strip_whitespace=True)
     checkpoint_type : constr(strip_whitespace=True)
-    script_type : Optional[Literal["FILE", "QUERY"]]
+    script_type : constr(strip_whitespace=True)
     script : Optional[constr(strip_whitespace=True)]
     source : Optional[constr(strip_whitespace=True)]
     target : Optional[constr(strip_whitespace=True)]
     configuration: Optional[Dict]
     is_active: bool
+    last_modified_utc: datetime
 
 
     @validator("checkpoint_type", pre=True)
@@ -34,6 +35,12 @@ class CheckpointModel(BaseModel):
 
     @validator("script_type", pre=True)
     def format_script_type(cls, value: str):
+
+        fmt_script_type: str = value.strip().upper()
+
+        if fmt_script_type not in CheckpointScriptType.__members__:
+            raise ValueError(f"Invalid script_type: {fmt_script_type}, execution accepts only {CheckpointScriptType.__members__}")
+        
         return value.strip().upper() if value else None
 
 
@@ -43,8 +50,13 @@ class CheckpointModel(BaseModel):
 
 
     @validator("configuration", pre=True)
-    def format_configuration(cls, value: str):
-        return json.loads(value) if value else None
+    def parse_configuration(cls, value: str):
+
+        if value:
+            value_dict: Dict = json.loads(value)
+            return value_dict
+    
+        return None
 
 
     class Config:

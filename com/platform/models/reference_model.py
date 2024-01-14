@@ -14,7 +14,7 @@ class ReferenceModel(BaseModel):
     module_name : constr(strip_whitespace=True)
     project_folder : constr(strip_whitespace=True)
     alert_mail_ids: List[str]
-    sla_days: int = Field(gt=0)
+    sla_days: int = Field(gt=-1)
     log_retention_count: int = Field(gt=0)
     last_modified_utc: datetime
     is_active: bool

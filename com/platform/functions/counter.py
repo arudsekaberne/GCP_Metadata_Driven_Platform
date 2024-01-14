@@ -20,6 +20,8 @@ def main_log_insert(process_id: int, bigquery: Bigquery, logger: Logger) -> None
     # Executes the sql statement
     bigquery.execute_query(reference_log_query)
 
+    logger.info("counter.main_log_insert() function executed successfully")
+
 
 def main_log_update(process_id: int, status: str, error_message: str, bigquery: Bigquery, logger: Logger):
 
@@ -33,7 +35,8 @@ def main_log_update(process_id: int, status: str, error_message: str, bigquery: 
                                 .replace(Placeholder.PROCESS_ID.value, process_id) \
                                 .replace(Placeholder.BATCH_DATE.value, CommonVariables.DATE) \
                                 .replace(Placeholder.LOG_STATUS.value, status) \
-                                .replace(Placeholder.LOG_ERROR_MSG.value, error_message)
+                                .replace(Placeholder.LOG_ERROR_MSG.value, f'"{error_message}"' if error_message else "NULL")
 
     # Executes the sql statement
     bigquery.execute_query(reference_log_query)
+    logger.info("counter.main_log_update() function exected successfully")

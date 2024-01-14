@@ -5,7 +5,7 @@ class Logger():
 
     """Class which helps in modularizing logging method"""
 
-    __BANNER_LEN: int = 75
+    __BANNER_LEN: int = 100
 
     def __init__(self, file_path: str, filemode: str = "a"):
 
@@ -38,13 +38,13 @@ class Logger():
     # Create a title card
     def title(self, value: str):
         title_dec: str = "*" * Logger.__BANNER_LEN
-        title_str: str = f"\n{title_dec}\n{value.strip().title().center(Logger.__BANNER_LEN, ' ')}\n{title_dec}"
+        title_str: str = f"\n{title_dec}\n{value.strip().center(Logger.__BANNER_LEN, ' ')}\n{title_dec}"
         self.__log.info(title_str); print(title_str)
 
 
     # Create a sub title card
     def subtitle(self, value: str):
-        sub_title_str = f" {value.strip().title()} "
+        sub_title_str = f" {value.strip()} "
         sub_title_str: str = f"\n{sub_title_str.center(Logger.__BANNER_LEN, '-')}" 
         self.__log.info(sub_title_str); print(sub_title_str)
 
