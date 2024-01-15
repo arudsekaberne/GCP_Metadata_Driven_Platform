@@ -11,6 +11,7 @@ class Placeholder(Enum):
     CURRENT_DATE: str      = r"${CURRENT_DATE}"
     START_SEQUENCE: str    = r"${START_SEQUENCE}"
     END_SEQUENCE: str      = r"${END_SEQUENCE}"
-    LOG_ERROR_MSG: str     = r"${LOG_ERROR_MSG}"
+    CHK_SEQUENCE_NO: str   = r"${CHK_SEQUENCE_NO}"
+    LOG_MSG: str           = r"${LOG_MSG}"
     CURRENT_TIMESTAMP: str = r"${CURRENT_TIMESTAMP}"
     LOG_FILE_NAME: str     = fr"{PROCESS_ID}_PLATFORM_{RUNTIME}.log"

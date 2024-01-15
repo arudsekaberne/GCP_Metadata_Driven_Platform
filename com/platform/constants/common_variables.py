@@ -16,7 +16,6 @@ class CommonVariables(metaclass=ImmutableMetaModel):
     __table_identifier     = lambda id, dataset, table: f"`{id}.{dataset}.{table}`"
 
     # Execution variables
-    DATE: str = datetime.now().strftime("%Y-%m-%d")
     RUNTIME: str = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # GCP Project details

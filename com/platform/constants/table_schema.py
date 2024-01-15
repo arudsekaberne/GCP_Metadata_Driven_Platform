@@ -23,7 +23,7 @@ class LogStatus(Enum):
 
     """Enum which defines the diferent log status"""
 
-    PROGRESS: str  = "PROGRESS"
-    COMPLETED: str = "COMPLETED"
-    FAILED: str    = "FAILED"
-    STOPPED: str   = "STOPPED"
+    PROGRESS: str  = "In-Progress"
+    COMPLETED: str = "Completed"
+    FAILED: str    = "Failed"
+    STOPPED: str   = "Stopped"

@@ -44,7 +44,7 @@ def interrupt_handler(signum, frame):
 
         logger.info(f"Updating {CommonVariables.REF_LOG_TABLE_NAME} with status '{LogStatus.STOPPED.value}'")
 
-        counter.main_log_update(parse_reference.process_id, LogStatus.STOPPED.value, "Execution got interrupted", bigquery, logger)
+        counter.reference_log_update(parse_reference.process_id, parse_args.batch_date, LogStatus.STOPPED.value, "Execution got interrupted", bigquery, logger)
 
 
     # Ensure the exit functions are executed
@@ -96,17 +96,17 @@ if __name__ == "__main__":
         inspector.is_process_active(parse_reference.is_active, parse_reference.process_name, logger)
         
         # Insert an entry in the main log
-        main_log_insert = counter.main_log_insert(parse_reference.process_id, bigquery, logger)
+        main_log_insert = counter.reference_log_insert(parse_reference.process_id, parse_args.batch_date, bigquery, logger)
 
         # Fetch, Parse, and Validate checkpoint data
         checkpoints: List[CheckpointModel] = collector.get_checkpoint_data(parse_reference.process_id, parse_args.from_checkpoint , parse_args.to_checkpoint ,bigquery, logger)
 
         # Execute each checkpoint
         for checkpoint in checkpoints:
-            runner.execute_checkpoint(parse_reference, checkpoint, bigquery, storage, logger)
+            runner.execute_checkpoint(parse_args, parse_reference, checkpoint, bigquery, storage, logger)
 
         # Update reference log with 'COMPLETED' status
-        counter.main_log_update(parse_reference.process_id, LogStatus.COMPLETED.value, None, bigquery, logger)
+        counter.reference_log_update(parse_reference.process_id, parse_args.batch_date, LogStatus.COMPLETED.value, None, bigquery, logger)
 
     except Exception as error:
         logger.title("Exception Block")
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
             logger.info(f"Updating {CommonVariables.REF_LOG_TABLE_NAME} with status '{LogStatus.FAILED.value}'")
 
-            counter.main_log_update(parse_reference.process_id, LogStatus.FAILED.value, error.message.split("\n")[0].strip().replace('"', '\\\"'), bigquery, logger)
+            counter.reference_log_update(parse_reference.process_id, parse_args.batch_date, LogStatus.FAILED.value, error.message.split("\n")[0].strip().replace('"', '\\\"'), bigquery, logger)
 
         logger.error(error)
         logger.error("Main execution failed.")

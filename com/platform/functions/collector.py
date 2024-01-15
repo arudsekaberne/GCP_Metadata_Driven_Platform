@@ -52,10 +52,11 @@ def get_checkpoint_data(process_id: int, start_sequence: str, end_sequence: str,
     # Preparing reference sql select statement
     checkpoint_query: str = SqlStatements.CHK_SELECT_STATEMENT \
                                 .replace(Placeholder.PROCESS_ID.value, process_id) \
-                                .replace(Placeholder.START_SEQUENCE.value, start_sequence)
-    
-    checkpoint_query: str = checkpoint_query.replace(Placeholder.END_SEQUENCE.value,
-                                                     f"checkpoint_sequence <= {end_sequence} AND" if end_sequence else "")
+                                .replace(Placeholder.START_SEQUENCE.value, start_sequence) \
+                                .replace(
+                                    Placeholder.END_SEQUENCE.value,
+                                    f"checkpoint_sequence <= {end_sequence} AND" if end_sequence else ""
+                                )
 
     # Executes the sql statement
     checkpoint_query_result: List[Row] = bigquery.select_query(checkpoint_query)

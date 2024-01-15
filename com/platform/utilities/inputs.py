@@ -5,7 +5,7 @@ from com.platform.models.input_model import InputModel
 
 # Pass input arguments
 import os, sys
-sys.argv = [os.path.basename(__file__), "-id", "1000", "-batch", "  2023-12-24", "-from", "1"]
+sys.argv = [os.path.basename(__file__), "-id", "1000", "-batch", "  2024-01-15"]
 
 
 class Inputs():
