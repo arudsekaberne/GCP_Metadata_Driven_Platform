@@ -20,7 +20,11 @@ class SqlStatements:
 
     CHK_SELECT_STATEMENT = f"""
         SELECT * FROM {CommonVariables.CHK_TABLE_IDN}
-        WHERE process_id = {Placeholder.PROCESS_ID.value} AND is_active
+        WHERE
+            process_id = {Placeholder.PROCESS_ID.value} AND
+            checkpoint_sequence >= {Placeholder.START_SEQUENCE.value} AND
+            {Placeholder.END_SEQUENCE.value}
+            is_active
         ORDER BY checkpoint_sequence ASC;        
     """
 

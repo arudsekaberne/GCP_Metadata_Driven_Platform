@@ -99,7 +99,7 @@ if __name__ == "__main__":
         main_log_insert = counter.main_log_insert(parse_reference.process_id, bigquery, logger)
 
         # Fetch, Parse, and Validate checkpoint data
-        checkpoints: List[CheckpointModel] = collector.get_checkpoint_data(parse_reference.process_id, bigquery, logger)
+        checkpoints: List[CheckpointModel] = collector.get_checkpoint_data(parse_reference.process_id, parse_args.from_checkpoint , parse_args.to_checkpoint ,bigquery, logger)
 
         # Execute each checkpoint
         for checkpoint in checkpoints:
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
             logger.info(f"Updating {CommonVariables.REF_LOG_TABLE_NAME} with status '{LogStatus.FAILED.value}'")
 
-            counter.main_log_update(parse_reference.process_id, LogStatus.FAILED.value, error.message.split("\n")[0].strip(), bigquery, logger)
+            counter.main_log_update(parse_reference.process_id, LogStatus.FAILED.value, error.message.split("\n")[0].strip().replace('"', '\\\"'), bigquery, logger)
 
         logger.error(error)
         logger.error("Main execution failed.")

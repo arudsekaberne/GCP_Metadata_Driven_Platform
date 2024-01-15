@@ -41,7 +41,7 @@ def get_reference_data(process_id: int, bigquery: Bigquery, logger: Logger) -> R
     return parse_reference
 
 
-def get_checkpoint_data(process_id: int, bigquery: Bigquery, logger: Logger) -> List[CheckpointModel]:
+def get_checkpoint_data(process_id: int, start_sequence: str, end_sequence: str, bigquery: Bigquery, logger: Logger) -> List[CheckpointModel]:
 
     """Function which fetch, parse, and validate ceckpoint table data"""
 
@@ -50,7 +50,12 @@ def get_checkpoint_data(process_id: int, bigquery: Bigquery, logger: Logger) -> 
     checkpoints: List[CheckpointModel] = []
 
     # Preparing reference sql select statement
-    checkpoint_query: str = SqlStatements.CHK_SELECT_STATEMENT.replace(Placeholder.PROCESS_ID.value, process_id)
+    checkpoint_query: str = SqlStatements.CHK_SELECT_STATEMENT \
+                                .replace(Placeholder.PROCESS_ID.value, process_id) \
+                                .replace(Placeholder.START_SEQUENCE.value, start_sequence)
+    
+    checkpoint_query: str = checkpoint_query.replace(Placeholder.END_SEQUENCE.value,
+                                                     f"checkpoint_sequence <= {end_sequence} AND" if end_sequence else "")
 
     # Executes the sql statement
     checkpoint_query_result: List[Row] = bigquery.select_query(checkpoint_query)

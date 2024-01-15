@@ -5,7 +5,7 @@ from com.platform.models.input_model import InputModel
 
 # Pass input arguments
 import os, sys
-sys.argv = [os.path.basename(__file__), "-id", "1000", "-batch", "  2023-12-24", "-from", "1", "-to", "10"]
+sys.argv = [os.path.basename(__file__), "-id", "1000", "-batch", "  2023-12-24", "-from", "1"]
 
 
 class Inputs():
@@ -22,7 +22,7 @@ class Inputs():
         parser.add_argument("-from",  "--from_checkpoint", required=False, help="Executes the process from mentioned checkpoint", default=1)
         parser.add_argument("-to",    "--to_checkpoint",   required=False, help="Executes the process until to checkpoint", default=None)
 
-        input_args: Namespace             = parser.parse_args()
+        input_args: Namespace         = parser.parse_args()
         self.__parse_args: InputModel = InputModel(**vars(input_args))
 
         logger.subtitle("Input Arguments")
